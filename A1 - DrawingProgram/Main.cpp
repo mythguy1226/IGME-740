@@ -20,8 +20,9 @@ float color[3];
 float mousePos[2];
 
 // Variables used for tracking shapes
-// including shape being currently drawn
+// including shape being currently drawn and its size
 ShapeType currentObjectType = ShapeType::None;
+ShapeSize currentObjectSize = ShapeSize::Small;
 Shape* currentShape = nullptr;
 vector<Shape*> shapes;
 
@@ -87,16 +88,16 @@ void mouse(int button, int state, int x, int y)
     // Detect left mouse button down
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
     {
-        // Return if object type hasnt been chosen
-        if (currentObjectType == ShapeType::None)
-            return;
-        
         // Initialization for first shape
         if (!currentShape)
         {
-            currentShape = new Shape(currentObjectType);
+            currentShape = new Shape(currentObjectType, currentObjectSize);
             shapes.push_back(currentShape);
         }
+
+        // Return if object type hasnt been chosen
+        if (currentObjectType == ShapeType::None)
+            return;
         
         // Get mouse position in canvas space
         mousePos[0] = (float)x / rasterSize[0] * canvasSize[0];
@@ -199,6 +200,15 @@ void menu(int value)
         break;
     case 10:
         ChangeShapeType(ShapeType::Polygons);
+        break;
+    case 11:
+        currentObjectSize = ShapeSize::Small;
+        break;
+    case 12:
+        currentObjectSize = ShapeSize::Medium;
+        break;
+    case 13:
+        currentObjectSize = ShapeSize::Large;
         break;
     default:
         break;
