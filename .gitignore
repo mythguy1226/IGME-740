@@ -1,0 +1,10 @@
+# This .gitignore file should be placed in the same directory as the repository's .sln file.
+
+# Visual Studio cache directory
+.vs/
+
+#Ignoring all temp and debug files
+Debug/
+x64/
+*/Debug/
+*/x64/
