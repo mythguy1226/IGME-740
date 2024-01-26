@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <vector>
-#include "Shape.h"
+#include "ShapeManager.h"
 
 using namespace std;
 
@@ -19,12 +19,8 @@ float color[3];
 
 float mousePos[2];
 
-// Variables used for tracking shapes
-// including shape being currently drawn and its size
-ShapeType currentObjectType = ShapeType::None;
-ShapeSize currentObjectSize = ShapeSize::Small;
-Shape* currentShape = nullptr;
-vector<Shape*> shapes;
+// Shape manager singleton
+ShapeManager* pShapeMngr = ShapeManager::GetInstance();
 
 void init(void)
 {
@@ -55,12 +51,9 @@ void display(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // Iterate through each shape and call its render method
-    for (Shape* shape : shapes)
-    {
-        shape->RenderShape(mousePos);
-    }
-
+    // Call shape manager to display all of its shapes
+    pShapeMngr->DisplayAllShapes(mousePos);
+    
     drawCursor();
     glutSwapBuffers();
 }
@@ -88,30 +81,16 @@ void mouse(int button, int state, int x, int y)
     // Detect left mouse button down
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
     {
-        // Initialization for first shape
-        if (!currentShape)
-        {
-            currentShape = new Shape(currentObjectType, currentObjectSize);
-            shapes.push_back(currentShape);
-        }
-
-        // Return if object type hasnt been chosen
-        if (currentObjectType == ShapeType::None)
-            return;
+        // Create shape if a type is chosen
+        if(pShapeMngr->GetObjectType() != ShapeType::None)
+            pShapeMngr->CreateShape();
         
         // Get mouse position in canvas space
         mousePos[0] = (float)x / rasterSize[0] * canvasSize[0];
         mousePos[1] = (float)(rasterSize[1] - y) / rasterSize[1] * canvasSize[1];
 
-        // Add a vertex to the new shape
-        currentShape->AddVertex(mousePos[0], mousePos[1], color);
-
-        // Once shape is complete set
-        // current to a new shape and add to list
-        if (currentShape->m_bIsComplete)
-        {
-            currentShape = nullptr;
-        }
+        // Add shape point
+        pShapeMngr->AddShapePoint(mousePos, color);
 
         glutPostRedisplay();
     }
@@ -136,28 +115,11 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
-void ChangeShapeType(ShapeType type)
-{
-    // Validate that current shape exists
-    // and isnt in the middle of being drawn
-    if (currentShape)
-        if (!currentShape->m_bIsComplete)
-            return;
-
-    // Set new object type
-    currentObjectType = type;
-}
-
 void menu(int value)
 {
     switch (value) {
     case 0: // clear
-        for(Shape* shape : shapes)
-        {
-            shapes.pop_back();
-        }
-        delete currentShape;
-        currentShape = nullptr;
+        pShapeMngr->Release();
         glutPostRedisplay();
         break;
     case 1: //exit
@@ -187,28 +149,28 @@ void menu(int value)
         glutPostRedisplay();
         break;
     case 6:
-        ChangeShapeType(ShapeType::Point);
+        pShapeMngr->SetObjectType(ShapeType::Point);
         break;
     case 7:
-        ChangeShapeType(ShapeType::Line);
+        pShapeMngr->SetObjectType(ShapeType::Line);
         break;
     case 8:
-        ChangeShapeType(ShapeType::Triangle);
+        pShapeMngr->SetObjectType(ShapeType::Triangle);
         break;
     case 9:
-        ChangeShapeType(ShapeType::Quad);
+        pShapeMngr->SetObjectType(ShapeType::Quad);
         break;
     case 10:
-        ChangeShapeType(ShapeType::Polygons);
+        pShapeMngr->SetObjectType(ShapeType::Polygons);
         break;
     case 11:
-        currentObjectSize = ShapeSize::Small;
+        pShapeMngr->SetObjectSize(ShapeSize::Small);
         break;
     case 12:
-        currentObjectSize = ShapeSize::Medium;
+        pShapeMngr->SetObjectSize(ShapeSize::Medium);
         break;
     case 13:
-        currentObjectSize = ShapeSize::Large;
+        pShapeMngr->SetObjectSize(ShapeSize::Large);
         break;
     default:
         break;

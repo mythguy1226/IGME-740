@@ -21,9 +21,11 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Shape.cpp" />
+    <ClCompile Include="ShapeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shape.h" />
+    <ClInclude Include="ShapeManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
