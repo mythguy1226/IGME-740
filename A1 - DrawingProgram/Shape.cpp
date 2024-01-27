@@ -155,7 +155,8 @@ void Shape::RenderShape(float* mousePos)
 			glBegin(GL_LINE_STRIP);
 			for (int i = 0; i < m_iNumVertices; i++)
 				glVertex2fv(m_aVertices + i * 2);
-			glVertex2fv(mousePos);
+			if(!m_bIsComplete) // Show next point if still drawing
+				glVertex2fv(mousePos);
 			glEnd();
 		}
 		break;
@@ -222,7 +223,8 @@ void Shape::RenderShape(float* mousePos)
 			glBegin(GL_POLYGON);
 			for (int i = 0; i < m_iNumVertices; i++)
 				glVertex2fv(m_aVertices + i * 2);
-			glVertex2fv(mousePos);
+			if (!m_bIsComplete) // Show next point if still drawing
+				glVertex2fv(mousePos);
 			glEnd();
 		}
 		break;

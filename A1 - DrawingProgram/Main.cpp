@@ -112,6 +112,10 @@ void keyboard(unsigned char key, int x, int y)
     case 27:
         exit(0);
         break;
+    case 32: // Space bar
+        if(pShapeMngr->GetObjectType() == ShapeType::Line || pShapeMngr->GetObjectType() == ShapeType::Polygons)
+            pShapeMngr->GetCurrentShape()->CompleteShape();
+        break;
     }
 }
 
