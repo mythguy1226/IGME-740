@@ -1,15 +1,15 @@
 #include "Shape.h"
 #include <iostream>
 
-Shape::Shape(ShapeType type, ShapeSize size)
+Shape::Shape(ShapeType a_eType, ShapeSize a_eSize)
 {
 	// Init member fields and number of points
-	m_eType = type;
-	m_eSize = size;
+	m_eType = a_eType;
+	m_eSize = a_eSize;
 	int numPoints = 0;
 
 	// Set number of points to allocate given type
-	switch (type)
+	switch (a_eType)
 	{
 	case Point:
 		numPoints = 1;
@@ -29,7 +29,7 @@ Shape::Shape(ShapeType type, ShapeSize size)
 	}
 
 	// Set shape size based on given enum type
-	switch (size)
+	switch (a_eSize)
 	{
 	case Small:
 		m_fSize = 2.0f;
@@ -48,37 +48,37 @@ Shape::Shape(ShapeType type, ShapeSize size)
 	m_iMaxVertices = numPoints;
 }
 
-Shape::Shape(Shape& other)
+Shape::Shape(Shape& a_pOther)
 {
 	// Copy the color and type
-	m_v3Color = other.m_v3Color;
-	m_eType = other.m_eType;
+	m_v3Color = a_pOther.m_v3Color;
+	m_eType = a_pOther.m_eType;
 
 	// Copy over vertex trackers and completion status
-	m_iNumVertices = other.m_iNumVertices;
-	m_iMaxVertices = other.m_iMaxVertices;
-	m_bIsComplete = other.m_bIsComplete;
+	m_iNumVertices = a_pOther.m_iNumVertices;
+	m_iMaxVertices = a_pOther.m_iMaxVertices;
+	m_bIsComplete = a_pOther.m_bIsComplete;
 
 	// Copy all vertex data
-	std::copy(other.m_aVertices, other.m_aVertices + other.m_iNumVertices, m_aVertices);
+	std::copy(a_pOther.m_aVertices, a_pOther.m_aVertices + a_pOther.m_iNumVertices, m_aVertices);
 }
 
-Shape& Shape::operator=(Shape& other)
+Shape& Shape::operator=(Shape& a_pOther)
 {
 	// Make sure you're not copying the same thing
-	if (this != &other)
+	if (this != &a_pOther)
 	{
 		// Copy the color and type
-		this->m_v3Color = other.m_v3Color;
-		this->m_eType = other.m_eType;
+		this->m_v3Color = a_pOther.m_v3Color;
+		this->m_eType = a_pOther.m_eType;
 
 		// Copy over vertex trackers and completion status
-		this->m_iNumVertices = other.m_iNumVertices;
-		this->m_iMaxVertices = other.m_iMaxVertices;
-		this->m_bIsComplete = other.m_bIsComplete;
+		this->m_iNumVertices = a_pOther.m_iNumVertices;
+		this->m_iMaxVertices = a_pOther.m_iMaxVertices;
+		this->m_bIsComplete = a_pOther.m_bIsComplete;
 
 		// Copy all vertex data
-		std::copy(other.m_aVertices, other.m_aVertices + other.m_iNumVertices, this->m_aVertices);
+		std::copy(a_pOther.m_aVertices, a_pOther.m_aVertices + a_pOther.m_iNumVertices, this->m_aVertices);
 	}
 
 	return *this;
@@ -101,18 +101,18 @@ void Shape::Release()
 	m_v3Color = nullptr;
 }
 
-void Shape::AddVertex(float x, float y, float* color)
+void Shape::AddVertex(float a_fX, float a_fY, float* a_v3Color)
 {
 	// Return if shape has been completed
 	if (m_bIsComplete)
 		return;
 
 	// Add vertices to vertex array
-	m_aVertices[m_iNumVertices * 2] = x;
-	m_aVertices[(m_iNumVertices * 2) + 1] = y;
+	m_aVertices[m_iNumVertices * 2] = a_fX;
+	m_aVertices[(m_iNumVertices * 2) + 1] = a_fY;
 
 	// Set the shape's color to what is passed in
-	m_v3Color = new float[3]{color[0], color[1], color[2]};
+	m_v3Color = new float[3]{a_v3Color[0], a_v3Color[1], a_v3Color[2]};
 
 	// Update vertices and complete
 	// shape if reached max vertices
@@ -127,7 +127,7 @@ void Shape::CompleteShape()
 	m_bIsComplete = true;
 }
 
-void Shape::RenderShape(float* mousePos)
+void Shape::RenderShape(float* a_v2MousePos)
 {
 	// Set drawing color based on shape color
 	if(m_v3Color)
@@ -148,16 +148,17 @@ void Shape::RenderShape(float* mousePos)
 		break;
 	case Line: // Strip of lines
 
-		// Start showing lines when there is more than one vertex
-		if (m_iNumVertices > 1)
+		// Start showing lines when there are vertices drawn
+		if (m_iNumVertices > 0)
 		{
 			glLineWidth(m_fSize);
 			glBegin(GL_LINE_STRIP);
 			for (int i = 0; i < m_iNumVertices; i++)
 				glVertex2fv(m_aVertices + i * 2);
 			if(!m_bIsComplete) // Show next point if still drawing
-				glVertex2fv(mousePos);
+				glVertex2fv(a_v2MousePos);
 			glEnd();
+			glLineWidth(2.0f);
 		}
 		break;
 	case Triangle: // Triangles
@@ -168,7 +169,7 @@ void Shape::RenderShape(float* mousePos)
 			glBegin(GL_LINE_STRIP);
 			for (int i = 0; i < m_iNumVertices; i++)
 				glVertex2fv(m_aVertices + i * 2);
-			glVertex2fv(mousePos);
+			glVertex2fv(a_v2MousePos);
 			glVertex2f(m_aVertices[0], m_aVertices[1]);
 			glEnd();
 		}
@@ -188,9 +189,9 @@ void Shape::RenderShape(float* mousePos)
 		{
 			glBegin(GL_LINE_STRIP);
 			glVertex2f(m_aVertices[0], m_aVertices[1]); // vertex 1
-			glVertex2f(mousePos[0], m_aVertices[1]); // vertex 3
-			glVertex2f(mousePos[0], mousePos[1]); // vertex 4
-			glVertex2f(m_aVertices[0], mousePos[1]); // vertex 2
+			glVertex2f(a_v2MousePos[0], m_aVertices[1]); // vertex 3
+			glVertex2f(a_v2MousePos[0], a_v2MousePos[1]); // vertex 4
+			glVertex2f(m_aVertices[0], a_v2MousePos[1]); // vertex 2
 			glVertex2f(m_aVertices[0], m_aVertices[1]); // vertex 1
 			glEnd();
 		}
@@ -214,7 +215,7 @@ void Shape::RenderShape(float* mousePos)
 			glBegin(GL_LINE_STRIP);
 			for (int i = 0; i < m_iNumVertices; i++)
 				glVertex2fv(m_aVertices + i * 2);
-			glVertex2fv(mousePos);
+			glVertex2fv(a_v2MousePos);
 			glEnd();
 		}
 		// Fill in polygon once there is more than one vertex
@@ -224,7 +225,7 @@ void Shape::RenderShape(float* mousePos)
 			for (int i = 0; i < m_iNumVertices; i++)
 				glVertex2fv(m_aVertices + i * 2);
 			if (!m_bIsComplete) // Show next point if still drawing
-				glVertex2fv(mousePos);
+				glVertex2fv(a_v2MousePos);
 			glEnd();
 		}
 		break;

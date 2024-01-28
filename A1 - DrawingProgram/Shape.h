@@ -26,9 +26,10 @@ enum ShapeSize
 	Large,
 };
 
-// Typedefs needed within and from including this header
-typedef unsigned int uint;
-
+/* CLASS: Shape
+ * USAGE: Class utilized for storing shape object data and 
+ * rendering shape instances
+ */
 class Shape
 {
 	// Array of all floats in the shape
@@ -52,11 +53,11 @@ public:
 	GLfloat m_fSize = 2.0f;
 
 	// Constructor
-	Shape(ShapeType type, ShapeSize size);
+	Shape(ShapeType a_eType, ShapeSize a_eSize);
 
 	// Rule of 3 (Copy Constructor/Copy Assignment Operator/Destructor)
-	Shape(Shape& other);
-	Shape& operator=(Shape& other);
+	Shape(Shape& a_pOther);
+	Shape& operator=(Shape& a_pOther);
 	~Shape();
 
 	// Cleans up pointers held in this object
@@ -64,13 +65,13 @@ public:
 
 	// Method used for adding a point to the shape 
 	// and indicating current color of the shape
-	void AddVertex(float x, float y, float* color);
+	void AddVertex(float a_fX, float a_fY, float* a_v3Color);
 	
 	// Method used for updating completion flag
 	void CompleteShape();
 
 	// Method used for rendering shape at display time
-	void RenderShape(float* mousePos);
+	void RenderShape(float* a_v2MousePos);
 };
 
 #endif // __SHAPE__
