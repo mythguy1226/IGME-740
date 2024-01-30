@@ -3,28 +3,28 @@
 
 Shape::Shape(ShapeType a_eType, ShapeSize a_eSize)
 {
-	// Init member fields and number of points
+	// Init member fields
 	m_eType = a_eType;
 	m_eSize = a_eSize;
-	int numPoints = 0;
+	m_v3Color = new float[3]{ 1.0f, 0.0f, 0.0f };
 
-	// Set number of points to allocate given type
+	// Set max points per shape
 	switch (a_eType)
 	{
 	case Point:
-		numPoints = 1;
+		m_iMaxVertices = 1;
 		break;
 	case Line:
-		numPoints = 100;
+		m_iMaxVertices = 100;
 		break;
 	case Triangle:
-		numPoints = 3;
+		m_iMaxVertices = 3;
 		break;
 	case Quad:
-		numPoints = 2;
+		m_iMaxVertices = 2;
 		break;
 	case Polygons:
-		numPoints = 100;
+		m_iMaxVertices = 100;
 		break;
 	}
 
@@ -41,11 +41,6 @@ Shape::Shape(ShapeType a_eType, ShapeSize a_eSize)
 		m_fSize = 10.0f;
 		break;
 	}
-
-	// Initialize float array holding 
-	// vertex data of positions
-	m_aVertices = new float[2 * numPoints];
-	m_iMaxVertices = numPoints;
 }
 
 Shape::Shape(Shape& a_pOther)
@@ -55,12 +50,11 @@ Shape::Shape(Shape& a_pOther)
 	m_eType = a_pOther.m_eType;
 
 	// Copy over vertex trackers and completion status
-	m_iNumVertices = a_pOther.m_iNumVertices;
 	m_iMaxVertices = a_pOther.m_iMaxVertices;
 	m_bIsComplete = a_pOther.m_bIsComplete;
 
-	// Copy all vertex data
-	std::copy(a_pOther.m_aVertices, a_pOther.m_aVertices + a_pOther.m_iNumVertices, m_aVertices);
+	// Copy vertex data
+	m_lVertices = a_pOther.m_lVertices;
 }
 
 Shape& Shape::operator=(Shape& a_pOther)
@@ -73,12 +67,11 @@ Shape& Shape::operator=(Shape& a_pOther)
 		this->m_eType = a_pOther.m_eType;
 
 		// Copy over vertex trackers and completion status
-		this->m_iNumVertices = a_pOther.m_iNumVertices;
 		this->m_iMaxVertices = a_pOther.m_iMaxVertices;
 		this->m_bIsComplete = a_pOther.m_bIsComplete;
 
-		// Copy all vertex data
-		std::copy(a_pOther.m_aVertices, a_pOther.m_aVertices + a_pOther.m_iNumVertices, this->m_aVertices);
+		// Copy vertex data
+		this->m_lVertices = a_pOther.m_lVertices;
 	}
 
 	return *this;
@@ -92,9 +85,8 @@ Shape::~Shape()
 
 void Shape::Release()
 {
-	// Delete vertex data
-	delete[] m_aVertices;
-	m_aVertices = nullptr;
+	// Clear vertex data
+	m_lVertices.clear();
 
 	// Delete color data
 	delete[] m_v3Color;
@@ -107,17 +99,14 @@ void Shape::AddVertex(float a_fX, float a_fY, float* a_v3Color)
 	if (m_bIsComplete)
 		return;
 
-	// Add vertices to vertex array
-	m_aVertices[m_iNumVertices * 2] = a_fX;
-	m_aVertices[(m_iNumVertices * 2) + 1] = a_fY;
-
 	// Set the shape's color to what is passed in
 	m_v3Color = new float[3]{a_v3Color[0], a_v3Color[1], a_v3Color[2]};
 
 	// Update vertices and complete
 	// shape if reached max vertices
-	m_iNumVertices++;
-	if (m_iNumVertices == m_iMaxVertices)
+	m_lVertices.push_back(a_fX);
+	m_lVertices.push_back(a_fY);
+	if (m_lVertices.size() / 2 == m_iMaxVertices)
 		CompleteShape();
 }
 
@@ -142,19 +131,19 @@ void Shape::RenderShape(float* a_v2MousePos)
 		// Plot a single point based on chosen size
 		glPointSize(m_fSize);
 		glBegin(GL_POINTS);
-		glVertex2f(m_aVertices[0], m_aVertices[1]);
+		glVertex2f(m_lVertices[0], m_lVertices[1]);
 		glEnd();
 		CompleteShape();
 		break;
 	case Line: // Strip of lines
 
 		// Start showing lines when there are vertices drawn
-		if (m_iNumVertices > 0)
+		if (m_lVertices.size() / 2 > 0)
 		{
 			glLineWidth(m_fSize);
 			glBegin(GL_LINE_STRIP);
-			for (int i = 0; i < m_iNumVertices; i++)
-				glVertex2fv(m_aVertices + i * 2);
+			for (int i = 0; i < m_lVertices.size(); i += 2)
+				glVertex2f(m_lVertices[i], m_lVertices[(i + 1) % m_lVertices.size()]);
 			if(!m_bIsComplete) // Show next point if still drawing
 				glVertex2fv(a_v2MousePos);
 			glEnd();
@@ -164,45 +153,45 @@ void Shape::RenderShape(float* a_v2MousePos)
 	case Triangle: // Triangles
 
 		// Outline triangle when plotting points still
-		if (m_iNumVertices > 0 && m_iNumVertices < m_iMaxVertices)
+		if (m_lVertices.size() / 2 > 0 && m_lVertices.size() / 2 < m_iMaxVertices)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int i = 0; i < m_iNumVertices; i++)
-				glVertex2fv(m_aVertices + i * 2);
+			for (int i = 0; i < m_lVertices.size(); i+=2)
+				glVertex2f(m_lVertices[i], m_lVertices[(i + 1) % m_lVertices.size()]);
 			glVertex2fv(a_v2MousePos);
-			glVertex2f(m_aVertices[0], m_aVertices[1]);
+			glVertex2f(m_lVertices[0], m_lVertices[1]); // First point in list to close the line strip
 			glEnd();
 		}
 		// Once triangle has all 3 vertices, fill it in
-		else if (m_iNumVertices == m_iMaxVertices)
+		else if (m_lVertices.size() / 2 == m_iMaxVertices)
 		{
 			glBegin(GL_TRIANGLES);
-			for (int i = 0; i < m_iNumVertices; i++)
-				glVertex2fv(m_aVertices + i * 2);
+			for (int i = 0; i < m_lVertices.size(); i+=2)
+				glVertex2f(m_lVertices[i], m_lVertices[(i + 1) % m_lVertices.size()]);
 			glEnd();
 		}
 		break;
 	case Quad: // Quads
 
 		// Use line strip to outline box when still deciding on 2nd corner
-		if (m_iNumVertices == 1)
+		if (m_lVertices.size() / 2 == 1)
 		{
 			glBegin(GL_LINE_STRIP);
-			glVertex2f(m_aVertices[0], m_aVertices[1]); // vertex 1
-			glVertex2f(a_v2MousePos[0], m_aVertices[1]); // vertex 3
+			glVertex2f(m_lVertices[0], m_lVertices[1]); // vertex 1
+			glVertex2f(a_v2MousePos[0], m_lVertices[1]); // vertex 3
 			glVertex2f(a_v2MousePos[0], a_v2MousePos[1]); // vertex 4
-			glVertex2f(m_aVertices[0], a_v2MousePos[1]); // vertex 2
-			glVertex2f(m_aVertices[0], m_aVertices[1]); // vertex 1
+			glVertex2f(m_lVertices[0], a_v2MousePos[1]); // vertex 2
+			glVertex2f(m_lVertices[0], m_lVertices[1]); // vertex 1
 			glEnd();
 		}
 		// Fill in the quad using the 2 corners
-		else if (m_iNumVertices == 2)
+		else if (m_lVertices.size() / 2 == 2)
 		{
 			glBegin(GL_TRIANGLE_STRIP);
-			glVertex2f(m_aVertices[0], m_aVertices[1]); // vertex 1
-			glVertex2f(m_aVertices[0], m_aVertices[3]); // vertex 2
-			glVertex2f(m_aVertices[2], m_aVertices[1]); // vertex 3
-			glVertex2f(m_aVertices[2], m_aVertices[3]); // vertex 4
+			glVertex2f(m_lVertices[0], m_lVertices[1]); // vertex 1
+			glVertex2f(m_lVertices[0], m_lVertices[3]); // vertex 2
+			glVertex2f(m_lVertices[2], m_lVertices[1]); // vertex 3
+			glVertex2f(m_lVertices[2], m_lVertices[3]); // vertex 4
 			glEnd();
 			CompleteShape();
 		}
@@ -210,20 +199,20 @@ void Shape::RenderShape(float* a_v2MousePos)
 	case Polygons: // Polygons
 
 		// Use line strip when not enough vertices to fill yet
-		if (m_iNumVertices > 0 && m_iNumVertices < 2) 
+		if (m_lVertices.size() / 2 > 0 && m_lVertices.size() / 2 < 2)
 		{
 			glBegin(GL_LINE_STRIP);
-			for (int i = 0; i < m_iNumVertices; i++)
-				glVertex2fv(m_aVertices + i * 2);
+			for (int i = 0; i < m_lVertices.size(); i+=2)
+				glVertex2f(m_lVertices[i], m_lVertices[(i + 1) % m_lVertices.size()]);
 			glVertex2fv(a_v2MousePos);
 			glEnd();
 		}
 		// Fill in polygon once there is more than one vertex
-		else if (m_iNumVertices > 1)
+		else if (m_lVertices.size() / 2 > 1)
 		{
 			glBegin(GL_POLYGON);
-			for (int i = 0; i < m_iNumVertices; i++)
-				glVertex2fv(m_aVertices + i * 2);
+			for (int i = 0; i < m_lVertices.size(); i+=2)
+				glVertex2f(m_lVertices[i], m_lVertices[(i + 1) % m_lVertices.size()]);
 			if (!m_bIsComplete) // Show next point if still drawing
 				glVertex2fv(a_v2MousePos);
 			glEnd();

@@ -7,6 +7,8 @@
 #include <GL/freeglut.h>
 #endif
 
+#include <vector>
+
 // Enum used for indicating type of shape being drawn
 enum ShapeType
 {
@@ -32,12 +34,10 @@ enum ShapeSize
  */
 class Shape
 {
-	// Array of all floats in the shape
-	float* m_aVertices;
+	// List of all vertices
+	std::vector<float> m_lVertices;
 
-	// Tracker for current number of drawn vertices
-	// and max amount of vertices allocated to this object
-	int m_iNumVertices = 0;
+	// Max vertices for tracking when to complete shape
 	int m_iMaxVertices = 0;
 
 public:
