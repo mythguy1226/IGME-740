@@ -19,7 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bone.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Rig.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Bone.h" />
+    <ClInclude Include="Rig.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
