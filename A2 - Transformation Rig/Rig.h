@@ -6,8 +6,11 @@ class Rig
 
 public:
 	Bone* m_pRoot;
+	Bone* selectedBone;
 	Rig();
 
-	void AddBone(Bone* a_pBone);
+	void ConstructRig();
+	void UpdateBoneRotations(float a_fAngle);
+	
 };
 
