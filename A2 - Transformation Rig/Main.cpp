@@ -75,6 +75,11 @@ void keyboard(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
+void keyboardUp(unsigned char key, int x, int y)
+{
+    glutPostRedisplay();
+}
+
 void specialKeyboard(int key, int x, int y)
 {
     if (key == GLUT_KEY_UP) // Up Arrow
@@ -96,6 +101,7 @@ int main(int argc, char *argv[])
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
+    glutKeyboardUpFunc(keyboardUp);
     //glutSpecialFunc(specialKeyboard);
     glutMainLoop();
     return 0;

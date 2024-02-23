@@ -7,27 +7,29 @@
 typedef glm::vec2 vector2;
 typedef glm::vec3 vector3;
 
+
 class Bone
 {
 	// Parent and child bones
 	Bone* m_pParent = nullptr;
-	std::vector<Bone*> m_lChildren;
+
 
 	// Transform information
-	vector3 m_v3Position;
-	float m_fRotation;
-	vector3 m_v3Scale;
+	vector3 m_v3Position = vector3();
+	float m_fRotation = 0.0f;
+	float m_fPrevRotation = 0.0f;
+	vector3 m_v3Scale = vector3();
 
 	// Pivot
-	vector3 m_v3Pivot;
+	vector3 m_v3Pivot = vector3();
 
-	// Selection status
-	bool m_bSelected = false;
 
 public:
+	std::vector<Bone*> m_lChildren;
+	bool currentDescendant = false;
 	Bone();
 
-	void drawRect(float size, vector3 a_v3Color);
+	void drawRect(vector3 a_v3Size, vector3 a_v3Color);
 	void RenderBone();
 
 	void SetParent(Bone* a_pParent);
@@ -40,8 +42,14 @@ public:
 	void SetRotation(float angle);
 	void SetScale(float x, float y, float z);
 
+	void SetSelected(Bone* a_pSelection);
+
 	void SetPivot(float x, float y, float z);
 
-	void SetSelected(bool a_bStatus);
+	void SetDescendants(Bone* a_pParent);
+	void ResetDescendants(Bone* a_pRoot);
 };
+
+// Selected Bone
+static Bone* m_pSelectedBone = nullptr;
 

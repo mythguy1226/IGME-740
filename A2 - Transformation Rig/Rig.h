@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Bone.h"
+
 class Rig
 {
 
@@ -11,6 +12,5 @@ public:
 
 	void ConstructRig();
 	void UpdateBoneRotations(float a_fAngle);
-	
 };
 

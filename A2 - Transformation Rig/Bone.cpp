@@ -6,6 +6,8 @@
 #include <GL/freeglut.h>
 #endif
 
+#include <iostream>
+
 Bone::Bone()
 {
 	m_v3Position = vector3();
@@ -13,39 +15,46 @@ Bone::Bone()
 	m_v3Scale = vector3();
 }
 
-void Bone::drawRect(float size, vector3 a_v3Color)
+void Bone::drawRect(vector3 a_v3Size, vector3 a_v3Color)
 {
 	glColor3fv(glm::value_ptr(a_v3Color));
 	glLineWidth(3.0f);
 	glBegin(GL_LINE_STRIP);
-	glVertex2f(-size, size); // vertex 1
-	glVertex2f(-size, -size); // vertex 4
-	glVertex2f(size, -size); // vertex 3
-	glVertex2f(size, size); // vertex 2
-	glVertex2f(-size, size); // vertex 1
+	glVertex2f(-a_v3Size.x, a_v3Size.y); // vertex 1
+	glVertex2f(-a_v3Size.x, -a_v3Size.y); // vertex 4
+	glVertex2f(a_v3Size.x, -a_v3Size.y); // vertex 3
+	glVertex2f(a_v3Size.x, a_v3Size.y); // vertex 2
+	glVertex2f(-a_v3Size.x, a_v3Size.y); // vertex 1
 	glEnd();
 }
 
 void Bone::RenderBone()
 {
+	// Set descendants of the selected bone
+	m_pSelectedBone->SetDescendants(m_pSelectedBone);
+
 	// Get the parent pivot
 	vector3 parentPivot = m_v3Pivot;
-	if(m_pParent && m_pParent->m_bSelected)
-		parentPivot = m_pParent->m_v3Pivot;
+	if(currentDescendant)
+		parentPivot = m_pSelectedBone->m_v3Pivot;
+
+	// Get bone color
+	vector3 v3Color;
+	if (this == m_pSelectedBone)
+		v3Color = vector3(1.0f, 0.0f, 0.0f);
 
 	glPushMatrix();
 	glTranslatef(parentPivot.x, parentPivot.y, parentPivot.z);
 	glRotatef(m_fRotation, 0.0f, 0.0f, 1.0f);
-	glScalef(m_v3Scale.x, m_v3Scale.y, m_v3Scale.z);
 	glTranslatef(-parentPivot.x, -parentPivot.y, -parentPivot.z);
 	glTranslatef(m_v3Position.x, m_v3Position.y, m_v3Position.z);
-	
-	drawRect(1.0f, vector3());
+	drawRect(m_v3Scale, v3Color);
 	glPopMatrix();
 
 	// Repeat this for all children if applicable
 	for (int i = 0; i < m_lChildren.size(); i++)
-		m_lChildren[i]->RenderBone();
+			m_lChildren[i]->RenderBone();
+		
 
 }
 
@@ -79,6 +88,8 @@ void Bone::SetPosition(float x, float y, float z)
 
 void Bone::SetRotation(float angle)
 {
+	m_fPrevRotation = m_fRotation;
+
 	m_fRotation = angle;
 
 	// Set children to share same rotation
@@ -93,6 +104,11 @@ void Bone::SetScale(float x, float y, float z)
 	m_v3Scale.z = z;
 }
 
+void Bone::SetSelected(Bone* a_pSelection)
+{
+	m_pSelectedBone = a_pSelection;
+}
+
 void Bone::SetPivot(float x, float y, float z)
 {
 	m_v3Pivot.x = x;
@@ -100,7 +116,16 @@ void Bone::SetPivot(float x, float y, float z)
 	m_v3Pivot.z = z;
 }
 
-void Bone::SetSelected(bool a_bStatus)
+void Bone::SetDescendants(Bone* a_pParent)
 {
-	m_bSelected = a_bStatus;
+	for (int i = 0; i < a_pParent->m_lChildren.size(); i++)
+		a_pParent->m_lChildren[i]->currentDescendant = true;
+	for (int i = 0; i < a_pParent->m_lChildren.size(); i++)
+		SetDescendants(a_pParent->m_lChildren[i]);
 }
+
+void Bone::ResetDescendants(Bone* a_pRoot)
+{
+
+}
+
