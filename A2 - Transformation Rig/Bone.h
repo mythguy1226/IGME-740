@@ -18,6 +18,12 @@ class Bone
 	float m_fRotation;
 	vector3 m_v3Scale;
 
+	// Pivot
+	vector3 m_v3Pivot;
+
+	// Selection status
+	bool m_bSelected = false;
+
 public:
 	Bone();
 
@@ -33,5 +39,9 @@ public:
 	void SetPosition(float x, float y, float z);
 	void SetRotation(float angle);
 	void SetScale(float x, float y, float z);
+
+	void SetPivot(float x, float y, float z);
+
+	void SetSelected(bool a_bStatus);
 };
 

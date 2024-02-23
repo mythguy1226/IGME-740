@@ -28,10 +28,18 @@ void Bone::drawRect(float size, vector3 a_v3Color)
 
 void Bone::RenderBone()
 {
+	// Get the parent pivot
+	vector3 parentPivot = m_v3Pivot;
+	if(m_pParent && m_pParent->m_bSelected)
+		parentPivot = m_pParent->m_v3Pivot;
+
 	glPushMatrix();
+	glTranslatef(parentPivot.x, parentPivot.y, parentPivot.z);
 	glRotatef(m_fRotation, 0.0f, 0.0f, 1.0f);
 	glScalef(m_v3Scale.x, m_v3Scale.y, m_v3Scale.z);
+	glTranslatef(-parentPivot.x, -parentPivot.y, -parentPivot.z);
 	glTranslatef(m_v3Position.x, m_v3Position.y, m_v3Position.z);
+	
 	drawRect(1.0f, vector3());
 	glPopMatrix();
 
@@ -83,4 +91,16 @@ void Bone::SetScale(float x, float y, float z)
 	m_v3Scale.x = x;
 	m_v3Scale.y = y;
 	m_v3Scale.z = z;
+}
+
+void Bone::SetPivot(float x, float y, float z)
+{
+	m_v3Pivot.x = x;
+	m_v3Pivot.y = y;
+	m_v3Pivot.z = z;
+}
+
+void Bone::SetSelected(bool a_bStatus)
+{
+	m_bSelected = a_bStatus;
 }
