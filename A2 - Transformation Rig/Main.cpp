@@ -83,10 +83,14 @@ void keyboardUp(unsigned char key, int x, int y)
 void specialKeyboard(int key, int x, int y)
 {
     if (key == GLUT_KEY_UP) // Up Arrow
-        //currentPart++;
-
+        testRig.SelectParent();
     if (key == GLUT_KEY_DOWN) // down arrow
-        //currentPart--;
+        testRig.SelectFirstChild();
+    if (key == GLUT_KEY_RIGHT) // right arrow
+        testRig.SelectNextChild(-1);
+    if (key == GLUT_KEY_LEFT) // left arrow
+        testRig.SelectNextChild(1);
+        
     glutPostRedisplay();
 }
 
@@ -102,7 +106,7 @@ int main(int argc, char *argv[])
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboardUp);
-    //glutSpecialFunc(specialKeyboard);
+    glutSpecialFunc(specialKeyboard);
     glutMainLoop();
     return 0;
     

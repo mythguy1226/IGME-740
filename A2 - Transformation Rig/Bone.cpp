@@ -53,9 +53,12 @@ void Bone::RenderBone()
 
 	// Repeat this for all children if applicable
 	for (int i = 0; i < m_lChildren.size(); i++)
-			m_lChildren[i]->RenderBone();
-		
+		m_lChildren[i]->RenderBone();
+}
 
+Bone* Bone::GetParent()
+{
+	return m_pParent;
 }
 
 void Bone::SetParent(Bone* a_pParent)

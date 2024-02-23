@@ -3,8 +3,7 @@
 Rig::Rig()
 {
 	m_pRoot = new Bone();
-	selectedBone = m_pRoot;
-	m_pRoot->SetSelected(m_pRoot);
+	SelectBone(m_pRoot);
 }
 
 void Rig::ConstructRig()
@@ -120,14 +119,63 @@ void Rig::ConstructRig()
 	rightFootBone->SetPosition(1.2f, -6.5f, 0.0f);
 	rightFootBone->SetPivot(0.75f, -5.5f, 0.0f);
 	rightFootBone->SetScale(1.0f, 0.5f, 1.0f);
-
-	selectedBone = neckBone;
-	m_pRoot->SetSelected(selectedBone);
 }
 
 void Rig::UpdateBoneRotations(float a_fAngle)
 {
 	selectedBone->SetRotation(selectedBone->GetRotation() + a_fAngle);
+}
+
+void Rig::SelectBone(Bone* a_pBone)
+{
+	selectedBone = a_pBone;
+	m_pRoot->SetSelected(selectedBone);
+	m_pRoot->ResetDescendants(m_pRoot);
+}
+
+void Rig::SelectParent()
+{
+	Bone* parent = selectedBone->GetParent();
+	if (parent)
+		SelectBone(parent);
+}
+
+void Rig::SelectFirstChild()
+{
+	if (selectedBone->m_lChildren.size() == 0)
+		return;
+
+	Bone* child = selectedBone->m_lChildren[0];
+	SelectBone(child);
+}
+
+void Rig::SelectNextChild(int a_iIndexChange)
+{
+	if (selectedBone->m_lChildren.size() == 0)
+		return;
+
+	if (a_iIndexChange < 0) // Leftward
+	{
+		// Loop to back of list
+		if (m_iCurrentChildIndex + a_iIndexChange < 0)
+			m_iCurrentChildIndex = selectedBone->m_lChildren.size() - 1;
+		else
+			m_iCurrentChildIndex += a_iIndexChange;
+
+	}
+	else // Rightward
+	{
+		// Loop to front of list
+		if (m_iCurrentChildIndex + a_iIndexChange > selectedBone->m_lChildren.size() - 1)
+			m_iCurrentChildIndex = 0;
+		else
+			m_iCurrentChildIndex += a_iIndexChange;
+	}
+
+	if (selectedBone->m_lChildren.size() == 1)
+		m_iCurrentChildIndex = 0;
+
+	SelectBone(selectedBone->m_lChildren[m_iCurrentChildIndex]);
 }
 
 

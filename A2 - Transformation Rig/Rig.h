@@ -12,5 +12,11 @@ public:
 
 	void ConstructRig();
 	void UpdateBoneRotations(float a_fAngle);
+
+	void SelectBone(Bone* a_pBone);
+	int m_iCurrentChildIndex = 0;
+	void SelectParent();
+	void SelectFirstChild();
+	void SelectNextChild(int a_iIndexChange);
 };
 

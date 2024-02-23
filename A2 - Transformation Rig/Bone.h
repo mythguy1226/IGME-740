@@ -32,6 +32,9 @@ public:
 	void drawRect(vector3 a_v3Size, vector3 a_v3Color);
 	void RenderBone();
 
+	Bone* GetParent();
+
+
 	void SetParent(Bone* a_pParent);
 	void AddChild(Bone* a_pChild);
 	void RemoveChild(Bone* a_pChild);
