@@ -41,7 +41,7 @@ void display(void)
     
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
+
     /* Draw all shapes that'll be part of the rig */
     testRig.m_pRoot->RenderBone();
     

@@ -35,8 +35,10 @@ void Bone::RenderBone()
 
 	// Get the parent pivot
 	vector3 parentPivot = m_v3Pivot;
-	if(currentDescendant)
+	if (currentDescendant)
+	{
 		parentPivot = m_pSelectedBone->m_v3Pivot;
+	}
 
 	// Get bone color
 	vector3 v3Color;
