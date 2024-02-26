@@ -11,27 +11,17 @@
 #include <iostream>
 #include <math.h>
 #include "Rig.h"
-using namespace std;
-
-#define NUM_PARTS 16
 
 int win_width = 600, win_height = 600;
 float canvas_width = 20.0f; float canvas_height = 20.0f;
 
-Rig testRig;
-bool keyStates[256];
-int buttonState;
+// Instance of bone rig
+Rig boneRig;
 
 void init(void)
 {
-    for(int i = 0; i<256; i++) {
-        keyStates[i] = false;
-    }
-    
-    buttonState = -1;
-
-    // Make root bone and add to rig
-    testRig.ConstructRig();
+    // Construct the bone rig here
+    boneRig.ConstructRig();
 }
 
 void display(void)
@@ -42,8 +32,8 @@ void display(void)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    /* Draw all shapes that'll be part of the rig */
-    testRig.m_pRoot->RenderBone();
+    // Draw all shapes that'll be part of the rig
+    boneRig.RenderRig();
     
     glutSwapBuffers();
 }
@@ -67,29 +57,28 @@ void keyboard(unsigned char key, int x, int y)
     if (key == 27) // 'esc' key
         exit(0);
 
+    // Input below is used for rotating the
+    // currently selected bone
     if (key == 'a') // A Key
-        testRig.UpdateBoneRotations(1.0f);
+        boneRig.UpdateBoneRotations(1.0f);
     if (key == 'd') // D Key
-        testRig.UpdateBoneRotations(-1.0f);
+        boneRig.UpdateBoneRotations(-1.0f);
     
-    glutPostRedisplay();
-}
-
-void keyboardUp(unsigned char key, int x, int y)
-{
     glutPostRedisplay();
 }
 
 void specialKeyboard(int key, int x, int y)
 {
+    // Input below is used for traversing tree
+    // to select bones to rotate
     if (key == GLUT_KEY_UP) // Up Arrow
-        testRig.SelectParent();
+        boneRig.SelectParent();
     if (key == GLUT_KEY_DOWN) // down arrow
-        testRig.SelectFirstChild();
+        boneRig.SelectFirstChild();
     if (key == GLUT_KEY_RIGHT) // right arrow
-        testRig.SelectNextChild(-1);
+        boneRig.SelectNextChild(-1);
     if (key == GLUT_KEY_LEFT) // left arrow
-        testRig.SelectNextChild(1);
+        boneRig.SelectNextChild(1);
         
     glutPostRedisplay();
 }
@@ -105,7 +94,6 @@ int main(int argc, char *argv[])
     glutReshapeFunc(reshape);
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
-    glutKeyboardUpFunc(keyboardUp);
     glutSpecialFunc(specialKeyboard);
     glutMainLoop();
     return 0;
