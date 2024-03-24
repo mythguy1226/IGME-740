@@ -41,14 +41,16 @@ unsigned char g_keyStates[256];
 char v_shader_file[] =
 //"..\\shaders\\basic.vert";
 //"..\\shaders\\displacement.vert"; // vertex displacement shader with perlin noise
-"..\\shaders\\perVert_lambert.vert"; // basic lambert lighting  
+//"..\\shaders\\perVert_lambert.vert"; // basic lambert lighting 
+"..\\shaders\\perVert_phong.vert"; // phong shading
 // "..\\shaders\\perFrag_lambert.vert"; // basic lambert lighting with per-fragment implementation
 // "..\\shaders\\toon_shading.vert"; // basic toon shading with per-fragment implementation
 
 char f_shader_file[] =
 //"..\\shaders\\basic.frag";
 // "..\\shaders\\displacement.frag"; // vertex displacement shader with perlin noise
-"..\\shaders\\perVert_lambert.frag"; // basic lambert shading 
+//"..\\shaders\\perVert_lambert.frag"; // basic lambert shading 
+"..\\shaders\\perVert_phong.frag"; // phong shading
 // "..\\shaders\\perFrag_lambert.frag"; // basic lambert shading with per-fragment implementation
 // "..\\shaders\\toon_shading.frag"; // basic toon shading with per-fragment implementation
 
@@ -61,16 +63,17 @@ const char meshFile[128] =
 Mesh g_mesh1;
 Mesh g_mesh2;
 
-vec3 g_lightPos = vec3(3, 3, 3);
+vec3 g_lightPos1 = vec3(3.0f, 3.0f, 3.0f);
+vec3 g_lightPos2 = vec3(1.0f, 0.0f, -2.0f);
 float g_time = 0.0f;
 
 void initialization() 
 {    
-    g_cam.set(1.0f, 2.0f, 4.0f, 0.0f, 1.0f, -0.5f, g_winWidth, g_winHeight);
+    g_cam.set(3.0f, 4.0f, 14.0f, 0.0f, 1.0f, -0.5f, g_winWidth, g_winHeight);
 	g_text.setColor(0.0f, 0.0f, 0.0f);
 
 	g_mesh1.create(meshFile, v_shader_file, f_shader_file);
-	// add any stuff you want to initialize ...
+	g_mesh2.create(meshFile, v_shader_file, f_shader_file);
 }
 
 /****** GL callbacks ******/
@@ -111,25 +114,16 @@ void display()
 	g_cam.drawGrid();
     g_cam.drawCoordinateOnScreen(g_winWidth, g_winHeight);
     g_cam.drawCoordinate();
-
-	// display the text
-	string str;
-	if(g_cam.isFocusMode()) {
-        str = "Cam mode: Focus";
-		g_text.draw(10, 30, const_cast<char*>(str.c_str()), g_winWidth, g_winHeight);
-	} else if(g_cam.isFPMode()) {
-        str = "Cam mode: FP";
-		g_text.draw(10, 30, const_cast<char*>(str.c_str()), g_winWidth, g_winHeight);
-	}
-	str = "vertex count: " + std::to_string(g_mesh1.vert_num);
-	g_text.draw(10, 45, const_cast<char*>(str.c_str()), g_winWidth, g_winHeight);
-	str = "triangle count: " + std::to_string(g_mesh1.tri_num);
-	g_text.draw(10, 60, const_cast<char*>(str.c_str()), g_winWidth, g_winHeight);
 		
 
 	g_time = (float)glutGet(GLUT_ELAPSED_TIME)/1000.0f;
+
+	// Draw the teapot meshes
 	glm::mat4 m4Model = glm::translate(glm::mat4(), glm::vec3(0.0f, 2.0f, 0.0f)) * glm::scale(glm::mat4(), glm::vec3(0.5f));
-	g_mesh1.draw(m4Model, g_cam.viewMat, g_cam.projMat, g_lightPos, g_time);
+	g_mesh1.draw(m4Model, g_cam.viewMat, g_cam.projMat, g_lightPos1, g_time);
+
+	m4Model = glm::translate(glm::mat4(), glm::vec3(3.0f, 2.0f, 0.0f)) * glm::scale(glm::mat4(), glm::vec3(0.5f));
+	g_mesh2.draw(m4Model, g_cam.viewMat, g_cam.projMat, g_lightPos1, g_time);
 
     glutSwapBuffers();
 }
