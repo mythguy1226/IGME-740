@@ -174,7 +174,7 @@ void Mesh::create(const char* filename, const char* v_shader_file, const char* f
 	prepareVBOandShaders(v_shader_file, f_shader_file);
 }
 
-void Mesh::draw(mat4 a_m4ModelMat, mat4 a_m4ViewMat, mat4 a_m4ProjMat, vec3 a_v3LightPos, float a_fTime) {
+void Mesh::draw(mat4 a_m4ModelMat, mat4 a_m4ViewMat, mat4 a_m4ProjMat, vec3 a_v3LightPos1, vec3 a_v3LightPos2, float a_fTime) {
 
 	glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -196,7 +196,8 @@ void Mesh::draw(mat4 a_m4ModelMat, mat4 a_m4ViewMat, mat4 a_m4ProjMat, vec3 a_v3
 	shaderProg.setMatrix4fv("modelMat", 1, value_ptr(a_m4ModelMat));
 	shaderProg.setMatrix4fv("viewMat", 1, value_ptr(a_m4ViewMat));
 	shaderProg.setMatrix4fv("projMat", 1, value_ptr(a_m4ProjMat));
-	shaderProg.setFloat3V("lightPos", 1, value_ptr(a_v3LightPos));
+	shaderProg.setFloat3V("lightPos1", 1, value_ptr(a_v3LightPos1));
+	shaderProg.setFloat3V("lightPos2", 1, value_ptr(a_v3LightPos2));
 	shaderProg.setFloat("time", a_fTime);
 	shaderProg.setFloat("offset", normal_offset);
 

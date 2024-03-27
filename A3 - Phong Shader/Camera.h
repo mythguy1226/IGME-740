@@ -90,6 +90,8 @@ public:
 
 	void drawFrustum();
 
+	void drawLight(mat4 modelMat, bool selected);
+
 private: 
     void horizontalRotate();    // for focus cam mode
 	void verticalRotate();      // for focus cam mode

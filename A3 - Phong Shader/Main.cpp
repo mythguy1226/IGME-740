@@ -38,33 +38,21 @@ Text g_text;
 
 unsigned char g_keyStates[256];
 
-char v_shader_file[] =
-//"..\\shaders\\basic.vert";
-//"..\\shaders\\displacement.vert"; // vertex displacement shader with perlin noise
-//"..\\shaders\\perVert_lambert.vert"; // basic lambert lighting 
-"..\\shaders\\perVert_phong.vert"; // phong shading
-// "..\\shaders\\perFrag_lambert.vert"; // basic lambert lighting with per-fragment implementation
-// "..\\shaders\\toon_shading.vert"; // basic toon shading with per-fragment implementation
+char v_shader_file1[] = "..\\shaders\\perVert_phong.vert"; // phong per vert shading
+char f_shader_file1[] = "..\\shaders\\perVert_phong.frag"; // phong per vert shading
+char v_shader_file2[] = "..\\shaders\\perFrag_phong.vert"; // phong per frag shading
+char f_shader_file2[] = "..\\shaders\\perFrag_phong.frag"; // phong per frag shading
 
-char f_shader_file[] =
-//"..\\shaders\\basic.frag";
-// "..\\shaders\\displacement.frag"; // vertex displacement shader with perlin noise
-//"..\\shaders\\perVert_lambert.frag"; // basic lambert shading 
-"..\\shaders\\perVert_phong.frag"; // phong shading
-// "..\\shaders\\perFrag_lambert.frag"; // basic lambert shading with per-fragment implementation
-// "..\\shaders\\toon_shading.frag"; // basic toon shading with per-fragment implementation
-
-const char meshFile[128] = 
-//"..\\Mesh\\sphere.obj";
-//"..\\Mesh\\bunny2K.obj";
-"..\\Mesh\\teapot.obj";
-//"..\\Mesh\\teddy.obj";
+const char meshFile[128] = "..\\Mesh\\teapot.obj"; // mesh to render
 
 Mesh g_mesh1;
 Mesh g_mesh2;
 
 vec3 g_lightPos1 = vec3(3.0f, 3.0f, 3.0f);
 vec3 g_lightPos2 = vec3(1.0f, 0.0f, -2.0f);
+
+int selectedLight = 1;
+
 float g_time = 0.0f;
 
 void initialization() 
@@ -72,8 +60,8 @@ void initialization()
     g_cam.set(3.0f, 4.0f, 14.0f, 0.0f, 1.0f, -0.5f, g_winWidth, g_winHeight);
 	g_text.setColor(0.0f, 0.0f, 0.0f);
 
-	g_mesh1.create(meshFile, v_shader_file, f_shader_file);
-	g_mesh2.create(meshFile, v_shader_file, f_shader_file);
+	g_mesh1.create(meshFile, v_shader_file1, f_shader_file1);
+	g_mesh2.create(meshFile, v_shader_file2, f_shader_file2);
 }
 
 /****** GL callbacks ******/
@@ -119,11 +107,17 @@ void display()
 	g_time = (float)glutGet(GLUT_ELAPSED_TIME)/1000.0f;
 
 	// Draw the teapot meshes
-	glm::mat4 m4Model = glm::translate(glm::mat4(), glm::vec3(0.0f, 2.0f, 0.0f)) * glm::scale(glm::mat4(), glm::vec3(0.5f));
-	g_mesh1.draw(m4Model, g_cam.viewMat, g_cam.projMat, g_lightPos1, g_time);
+	mat4 m4Model = translate(mat4(), vec3(0.0f, 2.0f, 0.0f)) * scale(mat4(), vec3(0.5f));
+	g_mesh1.draw(m4Model, g_cam.viewMat, g_cam.projMat, g_lightPos1, g_lightPos2, g_time);
 
-	m4Model = glm::translate(glm::mat4(), glm::vec3(3.0f, 2.0f, 0.0f)) * glm::scale(glm::mat4(), glm::vec3(0.5f));
-	g_mesh2.draw(m4Model, g_cam.viewMat, g_cam.projMat, g_lightPos1, g_time);
+	m4Model = translate(mat4(), vec3(3.0f, 2.0f, 0.0f)) * scale(mat4(), vec3(0.5f));
+	g_mesh2.draw(m4Model, g_cam.viewMat, g_cam.projMat, g_lightPos1, g_lightPos2, g_time);
+
+	// Draw the point lights
+	mat4 m4LightModel = translate(mat4(), g_lightPos1);
+	g_cam.drawLight(m4LightModel, selectedLight == 1);
+	m4LightModel = translate(mat4(), g_lightPos2);
+	g_cam.drawLight(m4LightModel, selectedLight == 2);
 
     glutSwapBuffers();
 }
@@ -174,6 +168,83 @@ void keyboard(unsigned char key, int x, int y)
 			break;
 		case'-':
 			g_mesh1.normal_offset -= 0.01;
+			break;
+
+		case '1': // Switch to light 1
+			selectedLight = 1;
+			break;
+		case '2': // Switch to light 2
+			selectedLight = 2;
+			break;
+
+		case 'a': // Move along negative x axis
+			switch (selectedLight)
+			{
+				case 1: // Light 1
+					g_lightPos1.x -= 0.1f;
+					break;
+				case 2: // Light 2
+					g_lightPos2.x -= 0.1f;
+					break;
+			}
+			break;
+		case 'd': // Move along positive x axis
+			switch (selectedLight)
+			{
+			case 1: // Light 1
+				g_lightPos1.x += 0.1f;
+				break;
+			case 2: // Light 2
+				g_lightPos2.x += 0.1f;
+				break;
+			}
+			break;
+
+		case 'w': // Move along negative z axis
+			switch (selectedLight)
+			{
+			case 1: // Light 1
+				g_lightPos1.z -= 0.1f;
+				break;
+			case 2: // Light 2
+				g_lightPos2.z -= 0.1f;
+				break;
+			}
+			break;
+		case 's': // Move along positive z axis
+			switch (selectedLight)
+			{
+			case 1: // Light 1
+				g_lightPos1.z += 0.1f;
+				break;
+			case 2: // Light 2
+				g_lightPos2.z += 0.1f;
+				break;
+			}
+			break;
+
+		case 'j': // Move along negative z axis
+			switch (selectedLight)
+			{
+			case 1: // Light 1
+				g_lightPos1.y -= 0.1f;
+				break;
+			case 2: // Light 2
+				g_lightPos2.y -= 0.1f;
+				break;
+			}
+			break;
+		case 'u': // Move along positive z axis
+			switch (selectedLight)
+			{
+			case 1: // Light 1
+				g_lightPos1.y += 0.1f;
+				break;
+			case 2: // Light 2
+				g_lightPos2.y += 0.1f;
+				break;
+			}
+			break;
 	}
 }
 

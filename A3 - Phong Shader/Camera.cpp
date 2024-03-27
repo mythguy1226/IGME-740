@@ -632,3 +632,20 @@ void Camera::drawFrustum()
     glLineWidth(1);
 	glPopMatrix();
 }
+
+void Camera::drawLight(mat4 modelMat, bool selected)
+{
+	glUseProgram(0);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_MODELVIEW);
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPushMatrix();
+	glLoadMatrixf(value_ptr(viewMat * modelMat));
+
+	if(selected)
+		glutSolidSphere(0.25f, 8, 8);
+	else
+		glutWireSphere(0.25f, 8, 8);
+	glPopMatrix();
+}
