@@ -90,6 +90,8 @@ public:
 
 	void drawFrustum();
 
+	// method for rendering point lights in form
+	// of a sphere
 	void drawLight(mat4 modelMat, bool selected);
 
 private: 

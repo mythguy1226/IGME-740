@@ -641,8 +641,11 @@ void Camera::drawLight(mat4 modelMat, bool selected)
 	glMatrixMode(GL_MODELVIEW);
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glPushMatrix();
+
+	// Load matrix with point light's model matrix included
 	glLoadMatrixf(value_ptr(viewMat * modelMat));
 
+	// Check if selected when rendering sphere type
 	if(selected)
 		glutSolidSphere(0.25f, 8, 8);
 	else

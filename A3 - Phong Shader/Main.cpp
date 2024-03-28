@@ -38,28 +38,35 @@ Text g_text;
 
 unsigned char g_keyStates[256];
 
+// Get paths to phong shader files
 char v_shader_file1[] = "..\\shaders\\perVert_phong.vert"; // phong per vert shading
 char f_shader_file1[] = "..\\shaders\\perVert_phong.frag"; // phong per vert shading
 char v_shader_file2[] = "..\\shaders\\perFrag_phong.vert"; // phong per frag shading
 char f_shader_file2[] = "..\\shaders\\perFrag_phong.frag"; // phong per frag shading
 
+// Path to teapot mesh obj
 const char meshFile[128] = "..\\Mesh\\teapot.obj"; // mesh to render
 
+// References to both teapot meshes
 Mesh g_mesh1;
 Mesh g_mesh2;
 
+// References to the two point light positions
 vec3 g_lightPos1 = vec3(3.0f, 3.0f, 3.0f);
 vec3 g_lightPos2 = vec3(1.0f, 0.0f, -2.0f);
 
+// Tracker for selected light
 int selectedLight = 1;
 
 float g_time = 0.0f;
 
 void initialization() 
-{    
+{  
+	// Init cam and text color
     g_cam.set(3.0f, 4.0f, 14.0f, 0.0f, 1.0f, -0.5f, g_winWidth, g_winHeight);
 	g_text.setColor(0.0f, 0.0f, 0.0f);
 
+	// Init mesh creation with two phong shader implementations
 	g_mesh1.create(meshFile, v_shader_file1, f_shader_file1);
 	g_mesh2.create(meshFile, v_shader_file2, f_shader_file2);
 }
