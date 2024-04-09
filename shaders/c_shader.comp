@@ -31,13 +31,13 @@ void main()
 {
 	const vec3 G = vec3 (0.0f, -9.8f, 0.0f);
 	uint g_id = gl_GlobalInvocationID.x;
-
+	
 	vec3 pos = Positions[g_id].xyz;
 	vec3 dir = Directions[g_id].xyz;
 	float speed = Speeds[g_id];
-
+	
 	pos += dir * speed * deltaT;
-
+	
 	if(pos.x <minPos.x) 
 	{
 		pos.x = minPos.x; 
@@ -48,7 +48,7 @@ void main()
 		pos.x = maxPos.x; 
 		dir.x = -abs(dir.x);
 	}
-
+	
 	if(pos.y <minPos.y) 
 	{
 		pos.y = minPos.y; 
@@ -59,7 +59,7 @@ void main()
 		pos.y = maxPos.y; 
 		dir.y = -abs(dir.y);
 	}
-
+	
 	if(pos.z <minPos.z) 
 	{
 		pos.z = minPos.z; 
@@ -70,9 +70,9 @@ void main()
 		pos.z = maxPos.z; 
 		dir.z = -abs(dir.z);
 	}
-
+	
 	normalize(dir);
-
+	
 	Positions[g_id].xyz = pos;
 	Directions[g_id].xyz = dir; 
 }

@@ -30,13 +30,13 @@ unsigned int curTime = 0; //the milliseconds since the start
 unsigned int preTime = 0;
 ParticleSystem parSys;
 
-char v_shader_file[] = ".\\shaders\\v_shader.vert";
-char f_shader_file[] = ".\\shaders\\f_shader.frag";
-char c_shader_file[] = ".\\shaders\\c_shader.comp";
+char v_shader_file[] = "..\\shaders\\v_shader.vert";
+char f_shader_file[] = "..\\shaders\\f_shader.frag";
+char c_shader_file[] = "..\\shaders\\c_shader.comp";
 
 void initialization()
 {
-	parSys.create(20, vec3(-10.0f, -10.0f, -10.0f), vec3(10.0f, 10.0f, 10.0f),
+	parSys.create(64, 32, vec3(-10.0, 0.0, -5.0), vec3(10.0, 10.0, -5.0),
 		c_shader_file, v_shader_file, f_shader_file);
 
 	g_cam.set(38.0f, 13.0f, 4.0f, 0.0f, 0.0f, 0.0f, g_winWidth, g_winHeight, 45.0f, 0.01f, 10000.0f);

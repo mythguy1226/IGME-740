@@ -15,7 +15,8 @@ using namespace std;
 // create the particles with the shader storage buffer objects
 ParticleSystem::ParticleSystem()
 {
-	num = 0;
+	numX = 0;
+	numY = 0;
 
 	size_min_point = vec3(0);
 	size_max_point = vec3(0);
@@ -52,14 +53,15 @@ float ParticleSystem::randomf(float min, float max)
 	return n * range + min;
 }
 
-void ParticleSystem::create(unsigned int num_of_particles, vec3 min_point, vec3 max_point,
+void ParticleSystem::create(unsigned int num_of_particlesX, unsigned int num_of_particlesY, vec3 min_point, vec3 max_point,
 	const char* compute_shader_file, const char* vertex_shader_file, const char* fragment_shader_file)
 {
-	if (num_of_particles <= 0) {
+	if (num_of_particlesX <= 0 && num_of_particlesY <= 0) {
 		cout << "The particle system wasn't created!" << endl;
 		return;
 	}
-	num = num_of_particles;
+	numX = num_of_particlesX;
+	numY = num_of_particlesY;
 	size_min_point = min_point;
 	size_max_point = max_point;
 
@@ -91,19 +93,25 @@ void ParticleSystem::create(unsigned int num_of_particles, vec3 min_point, vec3 
 	// creaste a ssbo of particle positions
 	glGenBuffers(1, &pos_ssbo);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, pos_ssbo);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, num * sizeof(vec4), NULL, GL_STATIC_DRAW); // there isn't data yet, just init memory, data will sent at run-time. 
+	glBufferData(GL_SHADER_STORAGE_BUFFER, (numX * numY) * sizeof(vec4), NULL, GL_STATIC_DRAW); // there isn't data yet, just init memory, data will sent at run-time. 
 
 	// map and create the postion array
-	pos_array = (vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, num * sizeof(vec4), bufMask);
+	pos_array = (vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, (numX * numY) * sizeof(vec4), bufMask);
 
+	vec3 stepSize = (size_max_point - size_min_point);
+	float xStep = stepSize.x / numX;
+	float yStep = stepSize.y / numY;
 	if (pos_array != NULL)
 	{
-		for (unsigned int i = 0; i < num; i++)
+		for (int i = 0; i < numX; i++)
 		{
-			pos_array[i].x = randomf(size_min_point.x, size_max_point.x);
-			pos_array[i].y = randomf(size_min_point.y, size_max_point.y);
-			pos_array[i].z = randomf(size_min_point.z, size_max_point.z);
-			pos_array[i].w = 1.0f;
+			for (int j = 0; j < numY; j++)
+			{
+				pos_array[i + j].x = size_min_point.x + (i * xStep);
+				pos_array[i + j].y = size_min_point.y + (j * yStep);
+				pos_array[i + j].z = size_min_point.z;
+				pos_array[i + j].w = 1.0f;
+			}
 		}
 	}
 	glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
@@ -111,12 +119,12 @@ void ParticleSystem::create(unsigned int num_of_particles, vec3 min_point, vec3 
 	// map and create the direction array
 	glGenBuffers(1, &dir_ssbo);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, dir_ssbo);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, num * sizeof(vec4), NULL, GL_STATIC_DRAW); // there isn't data yet, just init memory, data will sent at run-time. 
-	dir_array = (vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, num * sizeof(vec4), bufMask);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, (numX * numY) * sizeof(vec4), NULL, GL_STATIC_DRAW); // there isn't data yet, just init memory, data will sent at run-time. 
+	dir_array = (vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, (numX * numY) * sizeof(vec4), bufMask);
 
 	if (dir_array != NULL)
 	{
-		for (unsigned int i = 0; i < num; i++)
+		for (unsigned int i = 0; i < (numX * numY); i++)
 		{
 			vec4 v;
 			v.x = randomf();
@@ -131,12 +139,12 @@ void ParticleSystem::create(unsigned int num_of_particles, vec3 min_point, vec3 
 	// map and create the speed array
 	glGenBuffers(1, &speed_ssbo);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, speed_ssbo);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, num * sizeof(float), NULL, GL_STATIC_DRAW);
-	speed_array = (float*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, num * sizeof(float), bufMask);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, (numX * numY) * sizeof(float), NULL, GL_STATIC_DRAW);
+	speed_array = (float*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, (numX * numY) * sizeof(float), bufMask);
 
 	if (speed_array != NULL)
 	{
-		for (unsigned int i = 0; i < num; i++)
+		for (unsigned int i = 0; i < (numX * numY); i++)
 		{
 			speed_array[i] = randomf(5.0f, 10.0f);
 		}
@@ -146,16 +154,16 @@ void ParticleSystem::create(unsigned int num_of_particles, vec3 min_point, vec3 
 	// map and create the color array
 	glGenBuffers(1, &color_ssbo);
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, color_ssbo);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, num * sizeof(vec4), NULL, GL_STATIC_DRAW);
-	color_array = (vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, num * sizeof(vec4), bufMask);
+	glBufferData(GL_SHADER_STORAGE_BUFFER, (numX * numY) * sizeof(vec4), NULL, GL_STATIC_DRAW);
+	color_array = (vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, (numX * numY) * sizeof(vec4), bufMask);
 
 	if (color_array != NULL)
 	{
-		for (unsigned int i = 0; i < num; i++)
+		for (unsigned int i = 0; i < (numX * numY); i++)
 		{
-			color_array[i].r = randomf(0.0f, 1.0f);
-			color_array[i].g = randomf(0.0f, 1.0f);
-			color_array[i].b = randomf(0.0f, 1.0f);
+			color_array[i].r = 0.0f;
+			color_array[i].g = 0.0f;
+			color_array[i].b = 0.5f;
 			color_array[i].a = 1.0f;
 		}
 	}
@@ -193,10 +201,10 @@ void ParticleSystem::update(float delta_time)
 {
 	// invoke the compute shader to update the status of particles 
 	glUseProgram(cShaderProg.id);
-	cShaderProg.setFloat("deltaT", delta_time);
+	//cShaderProg.setFloat("deltaT", delta_time);
 	cShaderProg.setFloat3V("minPos", 1, glm::value_ptr(size_min_point));
 	cShaderProg.setFloat3V("maxPos", 1, glm::value_ptr(size_max_point));
-	glDispatchCompute((num+128-1)/128, 1, 1); // one-dimentional GPU threading config, 128 threads per froup 
+	glDispatchCompute(((numX * numY)+128-1)/128, 1, 1); // one-dimentional GPU threading config, 128 threads per froup 
 	glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
@@ -214,7 +222,7 @@ void ParticleSystem::draw(float particle_size, mat4 view_mat, mat4 proj_mat)
 	// draw particles as points with VAO
 	glBindVertexArray(vao);
 	glPointSize(particle_size);
-	glDrawArrays(GL_POINTS, 0, num);
+	glDrawArrays(GL_POINTS, 0, (numX * numY));
 
 	glPopMatrix();
 }

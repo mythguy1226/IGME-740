@@ -18,6 +18,20 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
+    <ClCompile Include="ShaderClass.cpp" />
+    <ClCompile Include="ShaderProgram.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="ShaderClass.h" />
+    <ClInclude Include="ShaderProgram.h" />
+    <ClInclude Include="Text.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -133,20 +147,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\Camera.cpp" />
-    <ClCompile Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\main.cpp" />
-    <ClCompile Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\ParticleSystem.cpp" />
-    <ClCompile Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\ShaderClass.cpp" />
-    <ClCompile Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\ShaderProgram.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\Camera.h" />
-    <ClInclude Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\ParticleSystem.h" />
-    <ClInclude Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\ShaderClass.h" />
-    <ClInclude Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\ShaderProgram.h" />
-    <ClInclude Include="D:\Profiles\rdr8959\Downloads\compute_shader_particle_system\src\Text.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
