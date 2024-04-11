@@ -57,6 +57,6 @@ public:
 	~ParticleSystem();
 	void create(unsigned int num_of_particlesX, unsigned int num_of_particlesY, vec3 min_point, vec3 max_point,
 				const char* compute_shader_file, const char* vertex_shader_file, const char* fragment_shader_file);
-	void update(float delta_time);  // invoke the compute shader in the update ()
+	void update(vec3 projOrigin, vec3 sphereCenter, float sphereRadius);  // invoke the compute shader in the update ()
 	void draw(float particle_size, mat4 view_mat, mat4 proj_mat);    // invoke the vert and frag shaders in the draw ()
 };
