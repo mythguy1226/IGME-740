@@ -89,6 +89,8 @@ public:
     void drawCoordinateOnScreen(int winW, int winH);
 
 	void drawFrustum();
+	void drawSphere(mat4 modelMat);
+	void drawProjection(vec3 origin, vec3 bottomCorner, vec3 topCorner);
 
 private: 
     void horizontalRotate();    // for focus cam mode

@@ -35,7 +35,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{78C43CBE-51F9-4C66-AE88-8B0A3D1C6B8E}</ProjectGuid>
+    <ProjectGuid>{B6C93800-18F0-4044-999C-4ABBBF06855C}</ProjectGuid>
     <RootNamespace>GGPProjects</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>A4 - Compute Shader</ProjectName>

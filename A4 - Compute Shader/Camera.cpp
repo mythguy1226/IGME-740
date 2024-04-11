@@ -632,3 +632,65 @@ void Camera::drawFrustum()
     glLineWidth(1);
 	glPopMatrix();
 }
+
+void Camera::drawSphere(mat4 modelMat)
+{
+	glUseProgram(0);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glMatrixMode(GL_MODELVIEW);
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glPushMatrix();
+
+	// Load matrix with sphere's model matrix included
+	glLoadMatrixf(value_ptr(viewMat * modelMat));
+
+	// Render the wire sphere
+	glutWireSphere(2.0, 20, 20);
+
+	glPopMatrix();
+}
+
+void Camera::drawProjection(vec3 origin, vec3 bottomCorner, vec3 topCorner)
+{
+	glUseProgram(0);
+	glDisable(GL_LIGHTING);
+	glLineWidth(1.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPushMatrix();
+
+	// Load matrix with sphere's model matrix included
+	glLoadMatrixf(value_ptr(viewMat * translate(mat4(), origin)));
+
+	// Render the wire sphere
+	glutSolidSphere(0.3, 20, 20);
+
+	glPopMatrix();
+
+	glBegin(GL_LINE_LOOP); // Bottom left corner
+	glVertex3fv(value_ptr(origin));
+	glVertex3fv(value_ptr(bottomCorner));
+	glEnd();
+
+	glBegin(GL_LINE_LOOP); // Top left corner
+	glVertex3fv(value_ptr(origin));
+	glVertex3fv(value_ptr(vec3(bottomCorner.x, topCorner.y, bottomCorner.z)));
+	glEnd();
+
+	glBegin(GL_LINE_LOOP); // Top right corner
+	glVertex3fv(value_ptr(origin));
+	glVertex3fv(value_ptr(topCorner));
+	glEnd();
+
+	glBegin(GL_LINE_LOOP); // Bottom right corner
+	glVertex3fv(value_ptr(origin));
+	glVertex3fv(value_ptr(vec3(topCorner.x, bottomCorner.y, bottomCorner.z)));
+	glEnd(); 
+
+	glLineWidth(1);
+	glPopMatrix();
+}

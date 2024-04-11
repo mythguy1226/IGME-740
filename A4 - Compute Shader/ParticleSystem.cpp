@@ -107,10 +107,10 @@ void ParticleSystem::create(unsigned int num_of_particlesX, unsigned int num_of_
 		{
 			for (int j = 0; j < numY; j++)
 			{
-				pos_array[i + j].x = size_min_point.x + (i * xStep);
-				pos_array[i + j].y = size_min_point.y + (j * yStep);
-				pos_array[i + j].z = size_min_point.z;
-				pos_array[i + j].w = 1.0f;
+				pos_array[i + numX * j].x = size_min_point.x + (i * xStep);
+				pos_array[i + numX * j].y = size_min_point.y + (j * yStep);
+				pos_array[i + numX * j].z = size_min_point.z;
+				pos_array[i + numX * j].w = 1.0f;
 			}
 		}
 	}

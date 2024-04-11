@@ -29,6 +29,7 @@ unsigned char g_keyStates[256];
 unsigned int curTime = 0; //the milliseconds since the start
 unsigned int preTime = 0;
 ParticleSystem parSys;
+vec3 sphereLoc;
 
 char v_shader_file[] = "..\\shaders\\v_shader.vert";
 char f_shader_file[] = "..\\shaders\\f_shader.frag";
@@ -43,6 +44,7 @@ void initialization()
 	g_text.setColor(0.0f, 0.0f, 0.0f);
 
 	// add any stuff you want to initialize ...
+	sphereLoc = vec3(0.0, 5.0, -8.0);
 }
 
 /****** GL callbacks ******/
@@ -83,11 +85,13 @@ void display()
 	glUseProgram(0);
 	glDisable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
-	parSys.draw(15.0f, g_cam.viewMat, g_cam.projMat);
+	parSys.draw(1.0f, g_cam.viewMat, g_cam.projMat);
 
 	g_cam.drawGrid();
 	g_cam.drawCoordinateOnScreen(g_winWidth, g_winHeight);
 	g_cam.drawCoordinate();
+	g_cam.drawSphere(translate(mat4(), sphereLoc));
+	g_cam.drawProjection(vec3(0.0f, 5.0f, 20.0f), vec3(-10.0, 0.0, -5.0), vec3(10.0, 10.0, -5.0));
 
 	// display the text
 	if (g_cam.isFocusMode()) {
@@ -143,6 +147,26 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case ' ':
 		g_cam.PrintProperty();
+		break;
+	case 'a': // Move along negative x axis
+		sphereLoc.x -= 0.1f;
+		break;
+	case 'd': // Move along positive x axis
+		sphereLoc.x += 0.1f;
+		break;
+
+	case 'w': // Move along negative z axis
+		sphereLoc.z -= 0.1f;
+		break;
+	case 's': // Move along positive z axis
+		sphereLoc.z += 0.1f;
+		break;
+
+	case 'j': // Move along negative z axis
+		sphereLoc.y -= 0.1f;
+		break;
+	case 'u': // Move along positive z axis
+		sphereLoc.y += 0.1f;
 		break;
 	}
 }
