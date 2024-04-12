@@ -28,25 +28,31 @@ unsigned char g_keyStates[256];
 
 unsigned int curTime = 0; //the milliseconds since the start
 unsigned int preTime = 0;
+
+// Particle system and sphere location
 ParticleSystem parSys;
 vec3 sphereLoc;
 
+// Particle num variables for managing resolution
 int particlesX = 64;
 int particlesY = 32;
 
+// File paths to needed shaders
 char v_shader_file[] = "..\\shaders\\v_shader.vert";
 char f_shader_file[] = "..\\shaders\\f_shader.frag";
 char c_shader_file[] = "..\\shaders\\c_shader.comp";
 
 void initialization()
 {
+	// Init the particle system with default values
 	parSys.create(particlesX, particlesY, vec3(-10.0, 0.0, -5.0), vec3(10.0, 10.0, -5.0),
 		c_shader_file, v_shader_file, f_shader_file);
 
+	// Setup camera
 	g_cam.set(38.0f, 13.0f, 4.0f, 0.0f, 0.0f, 0.0f, g_winWidth, g_winHeight, 45.0f, 0.01f, 10000.0f);
 	g_text.setColor(0.0f, 0.0f, 0.0f);
 
-	// add any stuff you want to initialize ...
+	// Initialize sphere location
 	sphereLoc = vec3(0.0, 5.0, -8.0);
 }
 
@@ -70,6 +76,8 @@ void idle()
 	// add any stuff to update at runtime ....
 	curTime = glutGet(GLUT_ELAPSED_TIME);
 	
+	// Call upon particle system's update function to pass in
+	// needed values for the compute shader
 	parSys.update(vec3(0.0f, 5.0f, 20.0f), sphereLoc, 2.0f);
 
 	g_cam.keyOperation(g_keyStates, g_winWidth, g_winHeight);
@@ -88,11 +96,16 @@ void display()
 	glUseProgram(0);
 	glDisable(GL_LIGHTING);
 	glEnable(GL_DEPTH_TEST);
+
+	// Display particle system
 	parSys.draw(1.0f, g_cam.viewMat, g_cam.projMat);
 
+	// Display typical camera stuff
 	g_cam.drawGrid();
 	g_cam.drawCoordinateOnScreen(g_winWidth, g_winHeight);
 	g_cam.drawCoordinate();
+
+	// Display sphere and projection sphere/lines
 	g_cam.drawSphere(translate(mat4(), sphereLoc));
 	g_cam.drawProjection(vec3(0.0f, 5.0f, 20.0f), vec3(-10.0, 0.0, -5.0), vec3(10.0, 10.0, -5.0));
 

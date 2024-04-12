@@ -98,6 +98,8 @@ void ParticleSystem::create(unsigned int num_of_particlesX, unsigned int num_of_
 	// map and create the postion array
 	pos_array = (vec4*)glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, (numX * numY) * sizeof(vec4), bufMask);
 
+	// Calculate the positions for each particle depending 
+	// on number of particles and bounds of the system
 	vec3 stepSize = (size_max_point - size_min_point);
 	float xStep = stepSize.x / numX;
 	float yStep = stepSize.y / numY;
@@ -107,6 +109,7 @@ void ParticleSystem::create(unsigned int num_of_particlesX, unsigned int num_of_
 		{
 			for (int j = 0; j < numY; j++)
 			{
+				// Set calculated values
 				pos_array[i + numX * j].x = size_min_point.x + (i * xStep);
 				pos_array[i + numX * j].y = size_min_point.y + (j * yStep);
 				pos_array[i + numX * j].z = size_min_point.z;
@@ -126,6 +129,7 @@ void ParticleSystem::create(unsigned int num_of_particlesX, unsigned int num_of_
 	{
 		for (unsigned int i = 0; i < (numX * numY); i++)
 		{
+			// Default color is dark blue (r:0.0, g:0.0, b:0.5, a:1.0)
 			color_array[i].r = 0.0f;
 			color_array[i].g = 0.0f;
 			color_array[i].b = 0.5f;
@@ -164,6 +168,8 @@ void ParticleSystem::update(vec3 projOrigin, vec3 sphereCenter, float sphereRadi
 {
 	// invoke the compute shader to update the status of particles 
 	glUseProgram(cShaderProg.id);
+
+	// Pass in needed values to compute shader uniform variables
 	cShaderProg.setFloat3V("projOrigin", 1, glm::value_ptr(projOrigin));
 	cShaderProg.setFloat3V("sphereCenter", 1, glm::value_ptr(sphereCenter));
 	cShaderProg.setFloat("sphereRadius", sphereRadius);
